@@ -7,29 +7,29 @@ echo " Train Start time: $(date -d @$start_time +'%Y-%m-%d %H:%M:%S')" >>${train
 
 # the default param set could be run in a server with one a100(40G) gpu, if your server not support the set,you can set smaller param such as  lora_rank and use qlora with quant 4 eg...
 CUDA_VISIBLE_DEVICES=0 python dbgpt_hub/train/sft_train.py \
-    --model_name_or_path Your_download_CodeLlama-13b-Instruct-hf_path \
+    --model_name_or_path /home/jack/llmmodels/chatglm3-6b \
     --do_train \
     --dataset example_text2sql_train \
     --max_source_length 2048 \
     --max_target_length 512 \
     --finetuning_type lora \
-    --lora_target q_proj,v_proj \
-    --template llama2 \
+    --lora_target query_key_value \
+    --template chatglm3 \
     --lora_rank 64 \
     --lora_alpha 32 \
-    --output_dir dbgpt_hub/output/adapter/CodeLlama-13b-sql-lora \
+    --output_dir dbgpt_hub/output/adapter/chatglm3-6b-sql-lora \
     --overwrite_cache \
     --overwrite_output_dir \
     --per_device_train_batch_size 1 \
-    --gradient_accumulation_steps 16 \
+    --gradient_accumulation_steps 8 \
     --lr_scheduler_type cosine_with_restarts \
     --logging_steps 50 \
     --save_steps 2000 \
     --learning_rate 2e-4 \
     --num_train_epochs 8 \
-    --plot_loss \
-    --bf16  >> ${train_log}
+    --plot_loss >> ${train_log}
     # --bf16#v100不支持bf16
+    # --quantization_bit 4 \
     
 echo "############train end###############" >>${train_log}
 echo "Train End time: $(date)" >>${train_log}
